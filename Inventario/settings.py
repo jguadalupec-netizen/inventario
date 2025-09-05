@@ -28,10 +28,10 @@ SECRET_KEY = os.environ.get(
 )
 
 # Debug activo para desarrollo
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # Hosts permitidos mientras desarrollas localmente
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 
