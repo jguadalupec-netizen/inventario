@@ -1,0 +1,231 @@
+{% extends "components/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<title>{% block title %}Registrar Movimiento{% endblock title %}</title>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xxl-10">
+            <h3 class="text-center mb-2 fw-bold text-primary-emphasis shadow">
+                {{ title1 }} Movimiento
+            </h3>
+            <div class="card shadow">
+                <div class="card-body p-2 p-md-3">
+                    <form id="frmMovimiento" method="POST">
+                        {% csrf_token %}
+                        {{ form.media }}
+
+                        <!-- Información principal del Movimiento -->
+                        <h5 class="text-primary-emphasis fw-bold">Información del Movimiento</h5>
+                        <hr class="border border-2 border-success">
+
+                        <div class="row g-3 mb-2">
+                            <div class="row g-3 mb-2">
+                                <div class="col-md-3">
+                                    <label for="{{ form.usuario_entrega.id_for_label }}" class="form-label fw-bold">{{ form.usuario_entrega.label }}</label>
+                                    {% render_field form.usuario_entrega class="form-control form-control-sm select2" %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.usuario_recibe.id_for_label }}" class="form-label fw-bold">{{ form.usuario_recibe.label }}</label>
+                                    {% render_field form.usuario_recibe class="form-control form-control-sm select2" %}
+                                </div>
+                                    <div class="col-md-3">
+                                        <label for="{{ form.fecha_entrega.id_for_label }}" class="form-label fw-bold">{{ form.fecha_entrega.label }}</label>
+                                        {% render_field form.fecha_entrega type="datetime-local" class="form-control form-control-sm" %}
+                                    </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.estado.id_for_label }}" class="form-label fw-bold">{{ form.estado.label }}</label>
+                                    {% render_field form.estado class="form-control form-control-sm" %}
+                                </div>
+                            </div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label for="{{ form.codigo_equipo.id_for_label }}" class="form-label fw-bold">{{ form.codigo_equipo.label }}</label>
+                                    {% render_field form.codigo_equipo class="form-control" style="height:30px;"%}
+                                </div>
+                                <div class="col-md-9">
+                                    <label for="{{ form.observaciones.id_for_label }}" class="form-label fw-bold">{{ form.observaciones.label }}</label>
+                                    {% render_field form.observaciones class="form-control" %}
+                                </div>
+                            </div>
+
+                        <!-- Detalle del Movimiento -->
+                        <h5 class="text-primary-emphasis fw-bold mt-4">Detalle del Movimiento</h5>
+                        <hr class="border border-2 border-success">
+
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-6">
+                                <label for="inventarioSelect" class="form-label fw-bold">Inventario</label>
+                                <select class="form-select form-select-sm select2" id="inventarioSelect">
+                                    {% for item in inventarios %}
+                                        <option value="{{ item.id }}">{{ item.item.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="detalleCantidad" class="form-label fw-bold">Cantidad</label>
+                                <input type="number" class="form-control form-control-sm" value="1" id="detalleCantidad" min="1">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-outline-success fw-bold w-100" onclick="movimiento.addDetalle()">
+                                    Agregar
+                                </button>
+                            </div>
+                        </div>
+
+                        <hr class="border border-3 border-danger">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="detalleTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-warning">Inventario</th>
+                                        <th class="text-primary">Cantidad</th>
+                                        <th class="text-danger">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end mt-4 gap-2">
+                            <button type="button" onclick="movimiento.saveMovimiento()" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar
+                            </button>
+                            <a class="btn btn-success" href="{% url 'core:movimiento_list' %}">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        width: '100%',
+        placeholder: 'Buscar...',
+        allowClear: true
+    });
+});
+
+class MovimientoForm {
+    constructor(detalleUpdate) {
+        this.detalles = [];
+        if (detalleUpdate && detalleUpdate.length > 0) {
+            detalleUpdate.forEach(det => {
+                let inventario_id = det.inventario__id;
+                let inventario_nombre = det.inventario__item__nombre;
+                let cantidad = det.cantidad;
+                this.detalles.push({ inventario_id, inventario_nombre, cantidad });
+            });
+            this.syncTable();
+        }
+    }
+
+    addDetalle() {
+        const inventario_id = document.querySelector('#inventarioSelect').value;
+        const inventario_nombre = document.querySelector('#inventarioSelect option:checked').text;
+        const cantidad = document.querySelector('#detalleCantidad').value;
+        if (!inventario_id || !cantidad || cantidad <= 0) {
+            alert('Seleccione inventario y cantidad válida.');
+            return;
+        }
+        // Si ya existe, suma la cantidad
+        const idx = this.detalles.findIndex(det => det.inventario_id == inventario_id);
+        if (idx >= 0) {
+            this.detalles[idx].cantidad += parseInt(cantidad);
+        } else {
+            this.detalles.push({ inventario_id, inventario_nombre, cantidad: parseInt(cantidad) });
+        }
+        this.syncTable();
+    }
+
+    removeDetalle(inventario_id) {
+        this.detalles = this.detalles.filter(det => det.inventario_id != inventario_id);
+        this.syncTable();
+    }
+
+    syncTable() {
+        const tableBody = document.querySelector('#detalleTable tbody');
+        tableBody.innerHTML = '';
+        this.detalles.forEach((det, index) => {
+            const row = `
+                <tr>
+                    <td>${det.inventario_nombre}</td>
+                    <td>${det.cantidad}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="movimiento.removeDetalle('${det.inventario_id}')">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    saveMovimiento() {
+        // Captura los datos del formulario principal
+        const usuario_entrega = document.querySelector('#id_usuario_entrega').value;
+        const usuario_recibe = document.querySelector('#id_usuario_recibe').value;
+        const fecha_entrega = document.querySelector('#id_fecha_entrega').value;
+        const estado = document.querySelector('#id_estado').value;
+        const observaciones = document.querySelector('#id_observaciones').value;
+        const codigo_equipo = document.querySelector('#id_codigo_equipo').value;
+
+        if (!usuario_entrega || !usuario_recibe || !fecha_entrega || !estado) {
+            alert('Complete todos los campos obligatorios.');
+            return;
+        }
+        if (this.detalles.length === 0) {
+            alert('Agregue al menos un detalle de inventario.');
+            return;
+        }
+        // Prepara los detalles para enviar
+        const detalles = this.detalles.map(det => ({
+            inventario_ids: [det.inventario_id],
+            cantidad: det.cantidad
+        }));
+        const data = {
+            usuario_entrega,
+            usuario_recibe,
+            fecha_entrega,
+            estado,
+            observaciones,
+            codigo_equipo,
+            detalles
+        };
+        let url = window.location.pathname.trim();
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.msg);
+            window.location.href = '/movimiento_list/';
+        })
+        .catch(error => {
+            console.error('Error al guardar el movimiento:', error);
+        });
+    }
+}
+
+// Inicializar la clase con los detalles si existen
+let detalleUpdate = JSON.parse('{{ detalle_movimiento|safe }}');
+const movimiento = new MovimientoForm(detalleUpdate);
+
+// Función para añadir un detalle al hacer clic en el botón
+// (ya está integrada en la clase)
+</script>
+{% endblock %}

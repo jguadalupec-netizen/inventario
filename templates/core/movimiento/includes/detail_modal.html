@@ -1,0 +1,42 @@
+<div class="modal fade" id="datosModal" tabindex="-1" aria-labelledby="datosModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary bg-opacity-75">
+                <h5 class="modal-title text-white fw-bold" id="movimientoModalLabel">
+                    <i class="fas fa-truck me-2"></i>Detalles del Movimiento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+           <div class="modal-body">
+             <div class="row">
+                <!-- Columna para los datos principales -->
+                <div class="col-md-12">
+                    <p><strong><i class="fas fa-hashtag me-2"></i>Movimiento#:</strong> <span id="movimiento-id"></span></p>
+                    <p><strong><i class="fas fa-user me-2"></i>Usuario Entrega:</strong> <span id="usuario-entrega"></span></p>
+                    <p><strong><i class="fas fa-user-check me-2"></i>Usuario Recibe:</strong> <span id="usuario-recibe"></span></p>
+                    <p><strong><i class="fas fa-calendar-alt me-2"></i>Fecha Entrega:</strong> <span id="fecha-entrega"></span></p>
+                    <p><strong><i class="fas fa-info-circle me-2"></i>Estado:</strong> <span id="estado"></span></p>
+                    <p><strong><i class="fas fa-barcode me-2"></i>Código Equipo:</strong> <span id="codigo-equipo"></span></p>
+                </div>
+             </div>
+              <div class="row">
+                <div class="col-md-12">
+                     <hr class="border border-3 border-danger">
+                     <div class="table-responsive">
+                       <table class="table table-hover" id="detalleTable">
+                          <thead>
+                            <tr>
+                                <th class="text-warning">Inventario</th>
+                                <th class="text-primary">Cantidad</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                         </table>
+                      </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    {% load static %}
+        <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- jQuery (requerido por Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" >
+    <link href="{% static 'css/all.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/home.css' %}" rel="stylesheet">
+    {% block css %}
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: hsl(180, 3%, 12%) ;
+            transition: all 0.3s;
+        }
+        /* Estilo opcional: Para la animación del menú deslizable */
+        .nav-link.collapsed {
+            cursor: pointer;
+            
+        }
+    
+        /* Se puede personalizar el comportamiento al hacer hover sobre los items */
+        .nav-link:hover {
+            background-color: #f8f9fa;  /* Fondo más claro al pasar el mouse */
+        }
+    
+        /* Estilo para el contenido del menú dentro del collapse */
+        .nav .nav-item .nav-link {
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+    
+        .nav-link.collapsed {
+            font-weight: bold;
+        }
+    
+        .nav-link.collapsed:focus {
+            color: #007bff;  /* Color al tener el foco */
+        }
+        
+    </style>
+    {% endblock %}
+  </head>
+  <body>
+   <div class="container-fluid">
+     <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 sidebar">
+            <div class="text-center py-3 border-bottom">
+                <img src="{% static 'img/inventario.jpg' %}" alt="Logo" class="mb-3 rounded shadow" width="120px">
+                <h5 class="text-white mb-0">{{ request.user }}</h5>
+                <small class="text-muted">Usuario activo</small>
+            </div>
+            <nav class="nav flex-column mt-4">
+                <span class="text-uppercase text-secondary px-3 mb-2" style="font-size:0.8rem;">Menú principal</span>
+                <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'movimiento_list' %}active{% endif %}" href="{% url 'core:movimiento_list' %}">
+                    <i class="fas fa-exchange-alt me-2"></i> Movimientos
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'inventario_list' %}active{% endif %}" href="{% url 'core:inventario_list' %}">
+                    <i class="fas fa-box me-2"></i> Inventario
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'item_list' %}active{% endif %}" href="{% url 'core:item_list' %}">
+                    <i class="fas fa-box-open me-2"></i> Items
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'categoria_list' %}active{% endif %}" href="{% url 'core:categoria_list' %}">
+                    <i class="fas fa-th-list me-2"></i> Categorías
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'tipo_objeto_list' %}active{% endif %}" href="{% url 'core:tipo_objeto_list' %}">
+                    <i class="fas fa-tag me-2"></i> Tipos de Objetos
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'usuario_list' %}active{% endif %}" href="{% url 'core:usuario_list' %}">
+                    <i class="fas fa-user me-2"></i> Usuarios
+                </a>
+                
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 px-md-4 main-content">
+            <!-- Top Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light sticky-top mb-4">
+                <div class="container-fluid">
+                <a class="text-white text-decoration-none fw-bold d-inline-flex align-items-center gap-2 transition-all hover:text-primary-dark" href="{% url 'core:home' %}">
+                        <i class="fas fa-home"></i> <!-- o cualquier otro icono de Font Awesome -->
+                        {{title}}
+                    </a>
+                    <div class="d-flex align-items-center">
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle text-white" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-md me-2"></i>{{ request.user.get_full_name|default:request.user.username }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Salir
+                                    </button>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+           <main>
+             <!-- llama al message de exito o fracaso -->
+             {% include 'includes/messages.html' %}
+            {% block content %}
+           
+            <!-- Dashboard Content -->
+             <div class="row g-4 mb-4 justify-content-center">
+                <!-- Stats Cards -->
+                <div class="col-md-5">
+                    <div class="card stat-card">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="icon-square bg-white text-primary">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div>
+                                <h6 class="card-title mb-0">Cantidad De Items</h6>
+                                <h3 class="mb-0">{{cantidad_de_items}}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="card stat-card" style="background: linear-gradient(45deg, #2ecc71, #27ae60);">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="icon-square bg-white text-success">
+                                <i class="fas fa-user-injured"></i>
+                            </div>
+                            <div>
+                            
+                                <h6 class="card-title mb-0">Cantidad de usuarios</h6> 
+                                <h3 class="mb-0">{{cant_usuarios}}</h3>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+            <!-- Quick Actions -->
+             <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Acciones Rápidas</h5>
+                            <div class="quick-actions d-flex flex-wrap gap-3">
+                                <a class="btn btn-primary text-white d-inline-flex align-items-center" href="{% url 'core:item_create' %}">
+                                    <i class="fas fa-tag me-2 "></i>
+                                    Nuevo Item
+                                </a>
+                                <a class="btn btn-primary text-white d-inline-flex align-items-center" href="{% url 'core:categoria_create' %}">
+                                  <i class="fas fa-archive me-2"></i>
+                                  Nueva Categoria
+                                </a>
+                               <a class="btn btn-info text-white" href="{% url 'core:tipo_objeto_create' %}">
+                                    <i class="fas fa-th-list me-2"></i>Nuevo Tipo
+                                </a>
+                               <a class="btn btn-info text-white" href="{% url 'core:movimiento_create' %}">
+                                    <i class="fas fa-exchange-alt me-2"></i>Nuevo Movimiento
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+            <!-- Recent Activity & Upcoming Appointments -->
+             <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Actividad Reciente</h5>
+                            <div class="activity-item d-flex align-items-center py-3 border-bottom">
+                                <div class="bg-primary text-white p-2 rounded me-3">
+                                    <i class="fas fa-tag"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-bold">Nuevo item registrado
+                                        <p class="mb-0">{{ ultimo_item_nombre }}</p>
+                                        <p class="mb-0">Tipo de objeto: {{ ultimo_item_tipo_objeto }}</p>
+                                        <p class="mb-0">Categoria: {{ ultimo_item_categoria }}</p>
+                                    </p>
+                                    <small class="text-muted"><small class="text-muted">
+                                        Ingresado el: {{ ultimo_item_fecha_hora_ingreso|date:"d \d\e F \d\e Y, H:i:s" }}
+                                    </small></small>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item d-flex align-items-center py-3">
+                                <div class="bg-info text-white p-2 rounded me-3">
+                                    <i class="fas fa-archive"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-bold">Nueva categoria registrada</p>
+                                    <p class="mb-0" >{{ ultim_categoria_nombre }}</p>
+                                    <small class="text-muted"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+            {% endblock %} 
+         </main>  
+        </div>
+     </div>
+   </div>
+   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+   {% block js %}{% endblock %}
+  </body>
+
+  
+</html>

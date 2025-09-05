@@ -1,0 +1,155 @@
+{% extends "components/base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 col-lg-12 px-md-4 main-content">
+      <div class="card mb-4">
+        <div class="card-body">
+
+          <!-- Título -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="card-title mb-0 text-primary fw-bold">Listado de Items</h3>
+          </div>
+
+          <!-- Buscador y botón nuevo -->
+          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between g-3 mb-4">
+            <form id="search-form" method="GET" action="{% url 'core:item_list' %}" class="d-flex flex-column flex-md-row gap-3 align-items-md-center">
+              <div class="col-md-6">
+                <input type="text" name="q" class="form-control search-box" value="{{ request.GET.q }}" placeholder="Buscar por nombre">
+              </div>
+              <button type="button" class="btn btn-secondary" onclick="resetSearch()">Borrar</button>
+              <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+
+            <a class="btn btn-primary mt-3 mt-md-0" href="{% url 'core:item_create' %}">
+              <i class="fas fa-plus me-2"></i>Nuevo Item
+            </a>
+          </div>
+
+          <!-- Tabla -->
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Tipo de Objeto</th>
+                  <th>Categoría</th>
+                  <th>Fecha y hora de ingreso</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in items %}
+                  <tr>
+                    <td>
+                      {{ item.nombre }}<br>
+                      <small class="text-muted">ID: {{ item.id }}</small>
+                    </td>
+                    <td>
+                      {% if item.descripcion %}
+                        {{ item.descripcion }}
+                      {% else %}
+                        <span class="text-muted">Sin descripción</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if item.tipo_objeto %}
+                        {{ item.tipo_objeto }}
+                      {% else %}
+                        <span class="text-muted">Sin tipo de objeto</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if item.categoria %}
+                        {{ item.categoria }}
+                      {% else %}
+                        <span class="text-muted">Sin categoría</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if item.Fecha_hora_de_ingreso %}
+                        {{ item.Fecha_hora_de_ingreso|date:"d/m/Y H:i:s" }}
+                      {% else %}
+                        <span class="text-muted">Sin descripción</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="action-buttons d-flex gap-2">
+
+                        <!-- Editar -->
+                        <a href="{% url 'core:item_update' item.id %}" class="btn btn-success btn-sm text-white" title="Editar Item">
+                          <i class="fas fa-edit"></i>
+                        </a>
+
+                        <!-- Eliminar -->
+                        {% with id=item.id name=item.nombre msg="¿Está seguro de eliminar este item?" %}
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="confirmDelete('{{ id }}','{{ name }}','{{ msg|escapejs }}');">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        {% endwith %}
+
+                      </div>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center text-muted">No se encontraron items.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <nav class="d-flex justify-content-between align-items-center mt-4">
+            <p class="text-muted mb-0">
+              {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} Tipos de Objetos
+            </p>
+            <ul class="pagination mb-0">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1"><i class="fas fa-chevron-left"></i></a>
+                </li>
+              {% endif %}
+              {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+              {% endfor %}
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fas fa-chevron-right"></i></a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'includes/confirm_delete_modal.html' %}
+{% endblock %}
+  <!-- añade el modal generico de eliminacion -->
+
+{% block js %}
+  <script>
+    function confirmDelete(id, name, msg) {
+        document.getElementById('modalMessage').innerText = `${msg} ${name}`;
+        const form = document.getElementById('deleteForm');
+        form.action = "{% url 'core:tipo_objeto_delete' 0 %}".replace('0', id);
+        const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        modal.show();
+    }
+      // Agrega esta función para el botón "Borrar" del buscador
+    function resetSearch() {
+      document.querySelector('input[name="q"]').value = '';
+      document.getElementById('search-form').submit();
+    }
+  </script>
+{% endblock %}
+
