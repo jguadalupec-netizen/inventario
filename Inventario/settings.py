@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-yf$rx1%s_$03kr)-2i=44(b!$^fu-inu%d1hn4-d*mkp#kcjf!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["Inventario.com", "localhost", "127.0.0.1"]
 
