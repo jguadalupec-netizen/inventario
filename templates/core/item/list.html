@@ -141,7 +141,7 @@
     function confirmDelete(id, name, msg) {
         document.getElementById('modalMessage').innerText = `${msg} ${name}`;
         const form = document.getElementById('deleteForm');
-        form.action = "{% url 'core:tipo_objeto_delete' 0 %}".replace('0', id);
+        form.action = "{% url 'core:item_delete' 0 %}".replace('0', id);
         const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
         modal.show();
     }
