@@ -23,8 +23,8 @@ class Categoria(models.Model):
 class Item(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
-    tipo_objeto = models.ForeignKey(TipoObjeto, on_delete=models.CASCADE)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    tipo_objeto = models.ForeignKey(TipoObjeto, on_delete=models.PROTECT)
+    categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
     Fecha_hora_de_ingreso = models.DateTimeField(auto_now_add=True)  # <-- Nuevo campo
 
     def __str__(self):
