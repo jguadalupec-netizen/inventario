@@ -23,15 +23,15 @@ class Categoria(models.Model):
 class Item(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
-    tipo_objeto = models.ForeignKey(TipoObjeto, on_delete=models.CASCADE)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    tipo_objeto = models.ForeignKey(TipoObjeto, on_delete=models.PROTECT)
+    categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
     Fecha_hora_de_ingreso = models.DateTimeField(auto_now_add=True)  # <-- Nuevo campo
 
     def __str__(self):
         return f"{self.nombre} - {self.descripcion} - {self.tipo_objeto.nombre} - {self.categoria.descripcion} - Ingresado el: {self.Fecha_hora_de_ingreso.strftime('%d/%m/%Y %H:%M:%S')}"
 
 class Inventario(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.PROTECT)
     stock = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
 
@@ -58,8 +58,8 @@ class Movimiento(models.Model):
         ("devuelto", "Devuelto"),
     )
 
-    usuario_entrega = models.ForeignKey(Usuario, related_name="movimientos_entregados", on_delete=models.CASCADE)
-    usuario_recibe = models.ForeignKey(Usuario, related_name="movimientos_recibidos", on_delete=models.CASCADE)
+    usuario_entrega = models.ForeignKey(Usuario, related_name="movimientos_entregados", on_delete=models.PROTECT)
+    usuario_recibe = models.ForeignKey(Usuario, related_name="movimientos_recibidos", on_delete=models.PROTECT)
     fecha_entrega = models.DateTimeField(blank=True, null=False)
     estado = models.CharField(max_length=20, choices=ESTADOS, default="pendiente")
     observaciones = models.TextField(blank=True, null=True)
@@ -69,7 +69,7 @@ class Movimiento(models.Model):
         return f"Movimiento {self.id} - {self.estado} - {self.fecha_entrega} - Entregado por: {self.usuario_entrega} - Recibido por: {self.usuario_recibe} - Código de equipo: {self.codigo_equipo}"
 
 class MovimientoDetalle(models.Model):
-    movimiento = models.ForeignKey(Movimiento, on_delete=models.CASCADE)
+    movimiento = models.ForeignKey(Movimiento, on_delete=models.PROTECT)
     inventario = models.ManyToManyField(Inventario)
     cantidad = models.PositiveIntegerField(default=1)
 
