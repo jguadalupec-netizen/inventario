@@ -58,8 +58,8 @@ class Movimiento(models.Model):
         ("devuelto", "Devuelto"),
     )
 
-    usuario_entrega = models.ForeignKey(Usuario, related_name="movimientos_entregados", on_delete=models.CASCADE)
-    usuario_recibe = models.ForeignKey(Usuario, related_name="movimientos_recibidos", on_delete=models.CASCADE)
+    usuario_entrega = models.ForeignKey(Usuario, related_name="movimientos_entregados", on_delete=models.PROTECT)
+    usuario_recibe = models.ForeignKey(Usuario, related_name="movimientos_recibidos", on_delete=models.PROTECT)
     fecha_entrega = models.DateTimeField(blank=True, null=False)
     estado = models.CharField(max_length=20, choices=ESTADOS, default="pendiente")
     observaciones = models.TextField(blank=True, null=True)
