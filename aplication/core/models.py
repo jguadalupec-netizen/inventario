@@ -31,7 +31,7 @@ class Item(models.Model):
         return f"{self.nombre} - {self.descripcion} - {self.tipo_objeto.nombre} - {self.categoria.descripcion} - Ingresado el: {self.Fecha_hora_de_ingreso.strftime('%d/%m/%Y %H:%M:%S')}"
 
 class Inventario(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.PROTECT)
     stock = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
 
