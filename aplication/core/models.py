@@ -42,9 +42,9 @@ class Inventario(models.Model):
 class Usuario(models.Model):
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
-    cedula = models.CharField(max_length=10, unique=True, validators=[valida_cedula])
-    telefono = models.CharField(max_length=10, blank=True, null=True, validators=[phone_regex])
-    correo = models.EmailField(unique=True)
+    cedula = models.CharField(blank=True,max_length=10, unique=True, validators=[valida_cedula])
+    telefono = models.CharField(blank=True,max_length=10, blank=True, null=True, validators=[phone_regex])
+    correo = models.EmailField(blank=True,unique=True)
     direccion = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
