@@ -55,7 +55,7 @@ class Usuario(models.Model):
         null=True,
         validators=[phone_regex]
     )
-    correo = models.EmailField(unique=True, blank=True, null=True)
+    correo = models.EmailField( blank=True, null=True)
     direccion = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
