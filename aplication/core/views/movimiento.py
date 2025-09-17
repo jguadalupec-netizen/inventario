@@ -134,3 +134,34 @@ class MovimientoUpdateView(LoginRequiredMixin,UpdateView):
         except Exception as ex:
             messages.error(self.request, "Error al actualizar el movimiento.")
             return JsonResponse({"msg": str(ex)}, status=400)
+
+# ...existing code...
+class MovimientoDetalleJsonView(LoginRequiredMixin, DetailView):
+    model = Movimiento
+
+    def get(self, request, *args, **kwargs):
+        movimiento = self.get_object()
+        # Agrupar cantidades por inventario (por si hay varios detalles que referencian al mismo inventario)
+        productos = {}
+        detalles_qs = MovimientoDetalle.objects.filter(movimiento=movimiento).prefetch_related('inventario__item')
+        for detalle in detalles_qs:
+            for inv in detalle.inventario.all():
+                key = inv.id
+                nombre = getattr(getattr(inv, 'item', None), 'nombre', str(inv))
+                productos.setdefault(key, {'nombre': nombre, 'cantidad': 0})
+                productos[key]['cantidad'] += detalle.cantidad
+
+        detalles_list = list(productos.values())
+
+        movimiento_data = {
+            'id': movimiento.id,
+            'usuario_entrega': getattr(getattr(movimiento, 'usuario_entrega', None), 'nombres', str(getattr(movimiento, 'usuario_entrega', ''))),
+            'usuario_recibe': getattr(getattr(movimiento, 'usuario_recibe', None), 'nombres', str(getattr(movimiento, 'usuario_recibe', ''))),
+            'fecha_entrega': movimiento.fecha_entrega.isoformat() if getattr(movimiento, 'fecha_entrega', None) else None,
+            'estado': movimiento.estado,
+            'observaciones': movimiento.observaciones,
+            'codigo_equipo': movimiento.codigo_equipo,
+        }
+
+        return JsonResponse({'movimiento': movimiento_data, 'detalles': detalles_list}, status=200)
+# ...existing code...
