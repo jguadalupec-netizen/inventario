@@ -6,6 +6,7 @@ from aplication.core.views.categoria import CategoriaCreateView,CategoriaListVie
 from aplication.core.views.item import ItemListView, ItemCreateView, ItemUpdateView, ItemDeleteView
 from aplication.core.views.inventario import InventarioListView, InventarioCreateView, InventarioUpdateView, InventarioDeleteView
 from aplication.core.views.movimiento import MovimientoListView, MovimientoCreateView, MovimientoUpdateView
+from aplication.core.views.movimiento import MovimientoDetalleJsonView
 app_name = 'core'
 
 urlpatterns = [
@@ -33,5 +34,7 @@ urlpatterns = [
     path('movimiento_list/', MovimientoListView.as_view(), name='movimiento_list'),
     path('movimiento_create/', MovimientoCreateView.as_view(), name='movimiento_create'),
     path('movimiento_update/<int:pk>/', MovimientoUpdateView.as_view(), name='movimiento_update'),
+    path('movimiento/<int:pk>/detalles/', MovimientoDetalleJsonView.as_view(), name='movimiento_detalle_json'),
+    
     
 ]
