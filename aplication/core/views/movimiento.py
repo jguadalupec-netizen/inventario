@@ -135,7 +135,10 @@ class MovimientoUpdateView(LoginRequiredMixin,UpdateView):
             messages.error(self.request, "Error al actualizar el movimiento.")
             return JsonResponse({"msg": str(ex)}, status=400)
 
+<<<<<<< HEAD
 # ...existing code...
+=======
+>>>>>>> 0c3fd3e (ultimo cambio)
 class MovimientoDetalleJsonView(LoginRequiredMixin, DetailView):
     model = Movimiento
 
@@ -163,5 +166,9 @@ class MovimientoDetalleJsonView(LoginRequiredMixin, DetailView):
             'codigo_equipo': movimiento.codigo_equipo,
         }
 
+<<<<<<< HEAD
         return JsonResponse({'movimiento': movimiento_data, 'detalles': detalles_list}, status=200)
 # ...existing code...
+=======
+        return JsonResponse({'movimiento': movimiento_data, 'detalles': detalles_list}, status=200)
+>>>>>>> 0c3fd3e (ultimo cambio)
